@@ -1,0 +1,49 @@
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Query @aws_api_key {
+  getSession(sessionId: String!): Session
+}
+type Mutation @aws_api_key {
+  createSession(participant: ParticipantInput!): Session
+  addParticipant(sessionId: String!, participant: ParticipantInput!): Participant
+  removeParticipant(sessionId: String!, participantEmail: String!): Participant
+  endSession(sessionId: String!): Session
+}
+type Subscription @aws_api_key {
+  onParticipantAdded(sessionId: String!): Participant
+    @aws_subscribe(mutations: ["addParticipant"])
+  onParticipantRemoved(sessionId: String!): Participant
+    @aws_subscribe(mutations: ["removeParticipant"])
+}
+
+type Session {
+  sessionId: String!
+  participants: [Participant]
+  sessionStatus: SessionStatus
+  createdAt: Int
+  expirationTime: Int
+}
+
+type Participant {
+  email: String!
+  sessionId: String
+  name: String
+  vote: Int
+  voteTime: Int
+  isSessionCreator: Boolean
+}
+
+input ParticipantInput {
+  email: String!
+  name: String
+}
+
+enum SessionStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
