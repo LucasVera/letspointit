@@ -9,15 +9,23 @@ type Query @aws_api_key {
 }
 type Mutation @aws_api_key {
   createSession(participant: ParticipantInput!): Session
+  startSession(sessionId: String!): Session
+  endSession(sessionId: String!): Session
   addParticipant(sessionId: String!, participant: ParticipantInput!): Participant
   removeParticipant(sessionId: String!, participantEmail: String!): Participant
-  endSession(sessionId: String!): Session
+  updateParticipantVote(sessionId: String!, participantEmail: String!, vote: Int!): Participant
 }
 type Subscription @aws_api_key {
   onParticipantAdded(sessionId: String!): Participant
     @aws_subscribe(mutations: ["addParticipant"])
   onParticipantRemoved(sessionId: String!): Participant
     @aws_subscribe(mutations: ["removeParticipant"])
+  onParticipantVoted(sessionId: String!): Participant
+    @aws_subscribe(mutations: ["updateParticipantVote"])
+  onSessionStarted(sessionId: String!): Session
+    @aws_subscribe(mutations: ["startSession"])
+  onSessionEnded(sessionId: String!): Session
+    @aws_subscribe(mutations: ["endSession"])
 }
 
 type Session {
